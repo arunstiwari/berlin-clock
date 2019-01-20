@@ -12,7 +12,7 @@ pipeline {
                 parallel(install: {
                     sh "mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml"
                 }, sonar: {
-                    sh "mvn sonar:sonar -Dsonar.host.url=${env.SONARQUBE_HOST} -Dsonar.login=${env.SONAR_LOGIN}"
+                    sh "mvn package"
                 })
             }
             post {
@@ -21,6 +21,13 @@ pipeline {
                     step([$class: 'CoberturaPublisher', coberturaReportFile: 'target/site/cobertura/coverage.xml'])
                 }
             }
+        }
+        stage('SonarQube analysis') {
+            // requires SonarQube Scanner 2.8+
+             def scannerHome = tool 'ADOP SonarScanner';
+             withSonarQubeEnv('ADOP Sonar') {
+                 sh "${scannerHome}/bin/sonar-scanner"
+             }
         }
     }
 }
