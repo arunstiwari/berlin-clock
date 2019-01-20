@@ -22,12 +22,19 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube analysis') {
-            // requires SonarQube Scanner 2.8+
-             def scannerHome = tool 'ADOP SonarScanner';
-             withSonarQubeEnv('ADOP Sonar') {
-                 sh "${scannerHome}/bin/sonar-scanner"
-             }
+        stage('SonarQube analysis') { 
+        withSonarQubeEnv('ADOP Sonar') { 
+          sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.3.0.603:sonar ' + 
+          '-f pom.xml ' +
+          '-Dsonar.projectKey=com.tekmentor:master ' +
+          '-Dsonar.login=admin ' +
+          '-Dsonar.password=admin ' +
+          '-Dsonar.language=java ' +
+          '-Dsonar.sources=. ' +
+          '-Dsonar.tests=. ' +
+          '-Dsonar.test.inclusions=**/*Test*/** ' +
+          '-Dsonar.exclusions=**/*Test*/**'
         }
+    }
     }
 }
